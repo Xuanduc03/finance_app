@@ -1,7 +1,6 @@
 import 'package:finance_app/app_event/add_transaction_event.dart';
 import 'package:finance_app/app_event/update_transaction_event.dart';
 import 'package:finance_app/model/transaction.dart';
-import 'package:event_bus_plus/event_bus_plus.dart';
 import 'package:finance_app/model/data_service.dart';
 import 'package:finance_app/model/utils.dart';
 import 'package:finance_app/screens/update_transaction.dart';
@@ -196,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
         Column(
           children: [
             Container(
-              width: double.infinity,
+              width: 360,
               height: 240,
               decoration: BoxDecoration(
                   color: Color(0xff368983),
@@ -208,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Positioned(
                       top: 16,
-                      left: 350,
+                      left: 300,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(7),
                         child: Container(
@@ -249,12 +248,13 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+
         Positioned(
             top: 140,
-            left: 37,
+            left: 20,
             child: Container(
               height: 170,
-              width: 340,
+              width: 320,
               decoration: BoxDecoration(
                   boxShadow: [
                     BoxShadow(

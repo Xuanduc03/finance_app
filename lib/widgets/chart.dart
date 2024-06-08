@@ -1,3 +1,4 @@
+import 'package:finance_app/model/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
@@ -9,33 +10,28 @@ class Chart extends StatefulWidget {
 }
 
 class _ChartState extends State<Chart> {
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      height: 300,
-      child: SfCartesianChart(
-        primaryXAxis: CategoryAxis(),
-        series: <SplineSeries<SalesData, String>>[
-          SplineSeries<SalesData, String>(
-            dataSource: <SalesData>[
-              SalesData(100, 'Mon'),
-              SalesData(200, 'Tue'),
-              SalesData(50, 'Wed'),
-              SalesData(65, 'Sat'),
-            ],
-            xValueMapper: (SalesData sales, _) => sales.year,
-            yValueMapper: (SalesData sales, _) => sales.sales,
-          ),
-        ],
-      ),
+      // width: double.infinity,
+      // height: 300,
+      // child: SfCartesianChart(
+      //   primaryXAxis: CategoryAxis(),
+      //   series: <SplineSeries<Transaction, String>>[
+      //     SplineSeries<Transaction, String>(
+      //       dataSource: <Transaction>[
+      //         Transaction(100, 'Mon'),
+      //         Transaction(200, 'Tue'),
+      //         Transaction(50, 'Wed'),
+      //         Transaction(65, 'Sat'),
+      //       ],
+      //       xValueMapper: (Transaction transaction, _) => transaction.dateTime,
+      //       yValueMapper: (Transaction transaction, _) => transaction.amount,
+      //     ),
+      //   ],
+      // ),
     );
   }
 }
 
-class SalesData {
-  final String year;
-  final int sales;
-
-  SalesData(this.sales, this.year);
-}
