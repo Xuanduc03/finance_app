@@ -113,109 +113,90 @@ class _AnalysisState extends State<Analysis> {
               ],
             ),
             SizedBox(height: 20),
-            Container(
-              height: 300,
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: Chart(),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 15),
-              child: Row(
-                children: [
-                  Text(
-                    "Sắp xếp chi phí",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  Icon(
-                    Icons.swap_vert,
-                    size: 25,
-                    color: Colors.amberAccent,
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
             FutureBuilder<List<Transaction>>(
-              future: dataService.getDataList(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<Transaction>> snapshot) {
+              future: _dataListFuture,
+              builder: (BuildContext context, AsyncSnapshot<List<Transaction>> snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return SliverToBoxAdapter(
-                    child: Center(
-                        child:
-                            CircularProgressIndicator()), // Hiển thị indicator khi đang tải dữ liệu
-                  );
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Đã xảy ra lỗi'));
+                } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                  return Center(child: Text('Không có dữ liệu'));
                 } else {
-                  if (snapshot.hasError) {
-                    return SliverToBoxAdapter(
-                      child: Center(
-                          child: Text(
-                              'Đã xảy ra lỗi')), // Hiển thị thông báo lỗi nếu có
-                    );
-                  } else {
-                    if (snapshot.data == null ||
-                        snapshot.data?.isEmpty == true) {
-                      return SliverToBoxAdapter(
-                        child: Center(
-                            child: Text(
-                                'Không có dữ liệu')), // Hiển thị thông báo nếu không có dữ liệu
-                      );
-                    } else {
-                      // Hiển thị dữ liệu nếu không có lỗi
-                      List<Transaction> data = snapshot.data!;
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (BuildContext context, int index) {
-                            return ListTile(
-                              leading: ClipRRect(
-                                borderRadius: BorderRadius.circular(5),
-                                child: Image.asset(
-                                  './assets/image/${data[index].category}.png',
-                                  fit: BoxFit.cover,
-                                  width: 60,
-                                  height: 60,
-                                ),
-                              ),
-                              title: Text(
-                                data[index].name as String,
-                                style: TextStyle(
-                                    fontSize: 17, fontWeight: FontWeight.w600),
-                              ),
-                              subtitle: Text(
-                                '${getDayOfWeek(data[index].dateTime)}  ${data[index].dateTime.day}/${data[index].dateTime.month}/${data[index].dateTime.year}',
-                                style: TextStyle(
+                  List<Transaction> data = snapshot.data!;
+                  return Column(
+                    children: [
+                      Container(
+                        height: 300,
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: Chart(transactions: data),
+                      ),
+                      SizedBox(height: 20),
+                      Padding(
+                        padding: EdgeInsets.only(left: 15),
+                        child: Row(
+                          children: [
+                            Text(
+                              "Sắp xếp chi phí",
+                              style: TextStyle(
                                   color: Colors.black,
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              trailing: Text(
-                                NumberFormat('#,##0', 'en_US')
-                                        .format(int.parse(data[index].amount)) +
-                                    'đ',
-                                style: TextStyle(
-                                  color: data[index].type == "Chi phí"
-                                      ? Colors.redAccent
-                                      : Colors.green,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            );
-                          },
-                          childCount: data.length,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Icon(
+                              Icons.swap_vert,
+                              size: 25,
+                              color: Colors.amberAccent,
+                            )
+                          ],
                         ),
-                      );
-                    }
-                  }
+                      ),
+                      SizedBox(height: 20),
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: data.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            leading: ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: Image.asset(
+                                './assets/image/${data[index].category}.png',
+                                fit: BoxFit.cover,
+                                width: 60,
+                                height: 60,
+                              ),
+                            ),
+                            title: Text(
+                              data[index].name,
+                              style: TextStyle(
+                                  fontSize: 17, fontWeight: FontWeight.w600),
+                            ),
+                            subtitle: Text(
+                              '${getDayOfWeek(data[index].dateTime)}  ${data[index].dateTime.day}/${data[index].dateTime.month}/${data[index].dateTime.year}',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                            trailing: Text(
+                              NumberFormat('#,##0', 'en_US')
+                                      .format(int.parse(data[index].amount)) +
+                                  'đ',
+                              style: TextStyle(
+                                color: data[index].type == "Chi phí"
+                                    ? Colors.redAccent
+                                    : Colors.green,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  );
                 }
               },
             ),

@@ -193,9 +193,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Stack(
       children: [
         Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Container(
-              width: 360,
               height: 240,
               decoration: BoxDecoration(
                   color: Color(0xff368983),
@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   Positioned(
                       top: 16,
-                      left: 300,
+                      right: 16,
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(7),
                         child: Container(
