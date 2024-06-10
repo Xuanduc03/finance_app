@@ -1,3 +1,5 @@
+import 'package:finance_app/model/data_service.dart';
+import 'package:finance_app/model/utils.dart';
 import 'package:flutter/material.dart';
 
 class UserProfile extends StatefulWidget {
@@ -8,7 +10,7 @@ class UserProfile extends StatefulWidget {
 }
 
 class _UserProfileState extends State<UserProfile> {
- 
+  DataService dataService = DataService();
   @override
   Widget build(BuildContext context) {
     final _width = MediaQuery.of(context).size.width;
@@ -80,12 +82,109 @@ class _UserProfileState extends State<UserProfile> {
                           child: new Padding(
                             padding: new EdgeInsets.all(_width / 20),
                             child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  headerChild('Tổng', 114),
-                                  headerChild('Chi phí', 1205),
-                                  headerChild('Thu nhập', 360),
-                                ]),
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  children: [
+                                    Text("Số dư"),
+                                    FutureBuilder(
+                                        future: total(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return CircularProgressIndicator(
+                                              color: Colors.white,
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                              "Error",
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold),
+                                            );
+                                          } else {
+                                            return Text(
+                                              '${snapshot.data} Đ',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600),
+                                            );
+                                          }
+                                        })
+                                  ],
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  children: [
+                                    Text("Chi tiêu"),
+                                    FutureBuilder(
+                                        future: totalExpenses(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return CircularProgressIndicator(
+                                              color: Colors.white,
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                              "Error",
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold),
+                                            );
+                                          } else {
+                                            return Text(
+                                              '${snapshot.data} Đ',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600),
+                                            );
+                                          }
+                                        })
+                                  ],
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Column(
+                                  children: [
+                                    Text("Thu nhập"),
+                                    FutureBuilder(
+                                        future: totalIncome(),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return CircularProgressIndicator(
+                                              color: Colors.white,
+                                            );
+                                          } else if (snapshot.hasError) {
+                                            return Text(
+                                              "Error",
+                                              style: TextStyle(
+                                                  color: Colors.red,
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.bold),
+                                            );
+                                          } else {
+                                            return Text(
+                                              '${snapshot.data} Đ',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600),
+                                            );
+                                          }
+                                        })
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
                         ),
                         new Padding(
@@ -99,7 +198,6 @@ class _UserProfileState extends State<UserProfile> {
                                   _width, Icons.group_add, 'Add to group'),
                               infoChild(_width, Icons.chat_bubble,
                                   'Show all comments'),
-                              
                             ],
                           ),
                         )
