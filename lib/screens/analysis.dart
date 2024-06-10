@@ -16,8 +16,8 @@ class Analysis extends StatefulWidget {
 }
 
 class _AnalysisState extends State<Analysis> {
-  List day = ['Ngày', 'Tuần', 'Tháng', 'Năm'];
-  int indexColor = 0;
+  List<String> periods = ['Ngày', 'Tuần', 'Tháng', 'Năm'];
+  int selectedPeriodIndex = 0;
   DataService dataService = DataService();
   late Future<List<Transaction>> _dataListFuture;
 
@@ -30,6 +30,37 @@ class _AnalysisState extends State<Analysis> {
         _dataListFuture = dataService.getDataList();
       });
     });
+  }
+
+  List<Transaction> filterTransactionsByPeriod(List<Transaction> transactions, String period) {
+    DateTime now = DateTime.now();
+    List<Transaction> filteredTransactions = [];
+
+    switch (period) {
+      case 'Ngày':
+        filteredTransactions = transactions.where((tx) =>
+            tx.dateTime.year == now.year &&
+            tx.dateTime.month == now.month &&
+            tx.dateTime.day == now.day).toList();
+        break;
+      case 'Tuần':
+        DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+        filteredTransactions = transactions.where((tx) =>
+            tx.dateTime.isAfter(startOfWeek) &&
+            tx.dateTime.isBefore(startOfWeek.add(Duration(days: 7)))).toList();
+        break;
+      case 'Tháng':
+        filteredTransactions = transactions.where((tx) =>
+            tx.dateTime.year == now.year &&
+            tx.dateTime.month == now.month).toList();
+        break;
+      case 'Năm':
+        filteredTransactions = transactions.where((tx) =>
+            tx.dateTime.year == now.year).toList();
+        break;
+    }
+
+    return filteredTransactions;
   }
 
   @override
@@ -51,11 +82,11 @@ class _AnalysisState extends State<Analysis> {
             SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(day.length, (index) {
+              children: List.generate(periods.length, (index) {
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      indexColor = index;
+                      selectedPeriodIndex = index;
                     });
                   },
                   child: Container(
@@ -63,17 +94,16 @@ class _AnalysisState extends State<Analysis> {
                     width: 80,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
-                      color: indexColor == index
+                      color: selectedPeriodIndex == index
                           ? Color.fromARGB(255, 47, 125, 121)
                           : const Color.fromARGB(255, 208, 207, 207),
                     ),
                     alignment: Alignment.center,
                     child: Text(
-                      day[index],
+                      periods[index],
                       style: TextStyle(
                         fontSize: 16,
-                        color:
-                            indexColor == index ? Colors.white : Colors.black,
+                        color: selectedPeriodIndex == index ? Colors.white : Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -123,13 +153,16 @@ class _AnalysisState extends State<Analysis> {
                 } else if (snapshot.data == null || snapshot.data!.isEmpty) {
                   return Center(child: Text('Không có dữ liệu'));
                 } else {
-                  List<Transaction> data = snapshot.data!;
+                  List<Transaction> filteredTransactions = filterTransactionsByPeriod(
+                    snapshot.data!,
+                    periods[selectedPeriodIndex],
+                  );
                   return Column(
                     children: [
                       Container(
                         height: 300,
                         padding: const EdgeInsets.symmetric(horizontal: 15),
-                        child: Chart(transactions: data),
+                        child: Chart(transactions: filteredTransactions),
                       ),
                       SizedBox(height: 20),
                       Padding(
@@ -155,25 +188,25 @@ class _AnalysisState extends State<Analysis> {
                       ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
-                        itemCount: data.length,
+                        itemCount: filteredTransactions.length,
                         itemBuilder: (context, index) {
                           return ListTile(
                             leading: ClipRRect(
                               borderRadius: BorderRadius.circular(5),
                               child: Image.asset(
-                                './assets/image/${data[index].category}.png',
+                                './assets/image/${filteredTransactions[index].category}.png',
                                 fit: BoxFit.cover,
                                 width: 60,
                                 height: 60,
                               ),
                             ),
                             title: Text(
-                              data[index].name,
+                              filteredTransactions[index].name,
                               style: TextStyle(
                                   fontSize: 17, fontWeight: FontWeight.w600),
                             ),
                             subtitle: Text(
-                              '${getDayOfWeek(data[index].dateTime)}  ${data[index].dateTime.day}/${data[index].dateTime.month}/${data[index].dateTime.year}',
+                              '${getDayOfWeek(filteredTransactions[index].dateTime)}  ${filteredTransactions[index].dateTime.day}/${filteredTransactions[index].dateTime.month}/${filteredTransactions[index].dateTime.year}',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.w400,
@@ -182,10 +215,10 @@ class _AnalysisState extends State<Analysis> {
                             ),
                             trailing: Text(
                               NumberFormat('#,##0', 'en_US')
-                                      .format(int.parse(data[index].amount)) +
+                                      .format(int.parse(filteredTransactions[index].amount)) +
                                   'đ',
                               style: TextStyle(
-                                color: data[index].type == "Chi phí"
+                                color: filteredTransactions[index].type == "Chi phí"
                                     ? Colors.redAccent
                                     : Colors.green,
                                 fontSize: 16,
